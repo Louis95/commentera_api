@@ -1,0 +1,65 @@
+version: "3.11"
+
+
+services:
+#  unittest:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    command: >
+#      sh -c "
+#             alembic upgrade head && python seed_database.py
+#             "
+#    environment:
+#      - DATABASE_URL=postgresql://postgres:commentera@db:5432/commentera
+#    depends_on:
+#      - db
+#    volumes:
+#      - ${HOME}/.aws/:/home/api/.aws:ro
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB=commentera
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=commentera
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "commentera" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+          sh -c "
+                 alembic upgrade head && python seed_database.py && python main.py
+                 "
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql://postgres:commentera@db:5432/commentera
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+#    command: sh -c "alembic upgrade head"
+
+    ports:
+      - "8000:8000"
+    restart: on-failure
+
+
+volumes:
+  pg_data:
