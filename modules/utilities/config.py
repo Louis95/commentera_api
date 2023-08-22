@@ -16,10 +16,13 @@ class AppConfig(BaseSettings):
     Config:
         env_file (str): Configuration file path.
     """
+
     secret_key: str
     refresh_rate: int
 
     class Config:
+        """Config class"""
+
         env_file = "config.toml"
 
 

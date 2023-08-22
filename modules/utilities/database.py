@@ -1,11 +1,11 @@
 """Database module, used for various database related methods"""
-import os
 import logging
-from dotenv import load_dotenv
+import os
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -41,19 +41,19 @@ def db_connection_string(environment=None) -> str:
     if environment == "local":
         if "DATABASE_URL" in os.environ:
             return os.environ["DATABASE_URL"]
-        raise Exception(
-            "Local environment is specified but DATABASE_URL cannot be found."
+        raise OSError(
+            "Local environment is specified but DATABASE_URL cannot be found.",
         )
 
     # postgresql
-    POSTGRESQL_HOST: str = os.environ["POSTGRESQL_HOST"]
-    POSTGRESQL_PORT: str = "5432"
+    postgresql_host: str = os.environ["POSTGRESQL_HOST"]
+    postgresql_port: str = "5432"
     # common
-    DB_NAME: str = os.environ["DB_NAME"]
-    USERNAME: str = os.environ["USERNAME"]
-    PASSWORD: str = os.environ["PASSWORD"]
+    db_name: str = os.environ["DB_NAME"]
+    username: str = os.environ["USERNAME"]
+    password: str = os.environ["PASSWORD"]
 
-    return f"postgresql://{USERNAME}:{PASSWORD}@{POSTGRESQL_HOST}:{POSTGRESQL_PORT}/{DB_NAME}"
+    return f"postgresql://{username}:{password}@{postgresql_host}:{postgresql_port}/{db_name}"
 
 
 DB_URL = db_connection_string()

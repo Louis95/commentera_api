@@ -1,3 +1,4 @@
+"""Auth schema"""
 from pydantic import BaseModel, Field
 
 
@@ -8,5 +9,5 @@ class GenerateToken(BaseModel):
 
     customer_alias: str = Field(
         ...,
-        description='Customer alias. You can get a sample alias from the csv'
+        description="Customer alias. You can get a sample alias from the csv",
     )

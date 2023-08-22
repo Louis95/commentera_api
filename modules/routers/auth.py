@@ -1,5 +1,8 @@
+"""Auth related routers"""
 import logging
-from fastapi import HTTPException, status, APIRouter, Body
+
+from fastapi import APIRouter, Body, HTTPException, status
+
 from modules.database.schemas.auth_schema import GenerateToken
 from modules.utilities.auth import generate_customer_token
 from modules.utilities.response import base_responses
@@ -13,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/generate_token")
 def generate_token(
-        customer_alias_info: GenerateToken = Body(..., description='Customer alias'),
+    customer_alias_info: GenerateToken = Body(..., description="Customer alias"),
 ) -> dict[str, str]:
     """
     Generate a token for the specified customer alias.

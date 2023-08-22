@@ -1,15 +1,17 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID
+"""badges mode"""
 
-from modules.database.models import TimeStampMixin
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
 from modules.utilities.database import Base
 
 
-class Badge(Base, TimeStampMixin):
+class Badge(Base):
     """
     Badge model.
     """
+
     __tablename__ = "badges"
     id = Column(Integer, primary_key=True, index=True)
     badge_name = Column(String, index=True)

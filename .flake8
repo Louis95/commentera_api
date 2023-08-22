@@ -110,4 +110,4 @@ exclude =
   ./deploy,
   ./var,
   ./.vscode,
-  *alembic*,
+  *migrations*,

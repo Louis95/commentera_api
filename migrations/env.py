@@ -1,21 +1,21 @@
 """Environment file for Alembic configuration."""
+# pylint: disable=no-member
 import os
 import sys
 from logging.config import fileConfig
 
+from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-from alembic import context
+from modules.database.models import Base
 from modules.utilities.database import db_connection_string
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 sys.path.append(BASE_DIR)
-# ------------------------------------------------------------#
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-config = context.config
+
+config = context.config  # pylint: disable=E1101
 # ---------------- added code here -------------------------#
 # this will overwrite the ini-file sqlalchemy.url path
 # with the path given in the config of the main code
@@ -30,13 +30,12 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # ---------------- added code here -------------------------#
-# from modules.utilities.database import Base
-from modules.database.models import Base
-
 # ------------------------------------------------------------#
 # ---------------- changed code here -------------------------#
 # here target_metadata was equal to None
 target_metadata = Base.metadata
+
+
 # ------------------------------------------------------------#
 
 
@@ -53,7 +52,7 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
+    context.configure(  # pylint: disable=E1101
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
@@ -61,7 +60,7 @@ def run_migrations_offline():
     )
 
     with context.begin_transaction():
-        context.run_migrations()
+        context.run_migrations()  # pylint: disable=E1101
 
 
 def run_migrations_online():
@@ -84,7 +83,7 @@ def run_migrations_online():
             context.run_migrations()
 
 
-if context.is_offline_mode():
+if context.is_offline_mode():  # pylint: disable=E1101
     run_migrations_offline()
 else:
-    run_migrations_online()
+    run_migrations_online()  # pylint: disable=E1101

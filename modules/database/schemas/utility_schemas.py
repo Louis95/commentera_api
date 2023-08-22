@@ -6,6 +6,9 @@ class SuccessfulResponseOut(BaseModel):
     """Successful response schema"""
 
     status_code: int = Field(
-        ..., description="Status code of response", gte=200, lte=299
+        ...,
+        description="Status code of response",
+        gte=200,
+        lte=299,
     )
     message: str = Field(..., description="Message of response")

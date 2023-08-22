@@ -17,7 +17,7 @@ The Commentera API is a Python application, so you'll need a working Python envi
 The API currently requires Python 3.11+.
 
 ### Create a Virtual Environment
-It's recommended to create and activate a virtual environment before installing dependencies. 
+It's recommended to create and activate a virtual environment before installing dependencies.
 
 Python offers a built-in method for installing lightweight virtual environments, the `venv` module. To create a virtual environment with this command:
 
@@ -91,7 +91,7 @@ Install dependencies using the command given above
 
 2. **Create A Database**
 
-In order to perform migrations and run the app, you'll need to create a database. 
+In order to perform migrations and run the app, you'll need to create a database.
 you should create a database called `commentera`
 To do this, you can use the [Postico](https://eggerapps.at/postico/) app or any other Postgresql client of your choice.
 
@@ -155,7 +155,7 @@ You can test by running the command. Make you have your database set-up before r
 $ pytest
 ```
 
-### 
+###
 
 ## API Documentation
 

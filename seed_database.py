@@ -1,16 +1,14 @@
+"""Seed database"""
 import csv
 import uuid
 
-from sqlalchemy import cast
-from sqlalchemy.orm import Session
-from modules.database.models import User, Badge
+from modules.database.models import Badge, User
 from modules.utilities.database import SessionLocal
-from sqlalchemy.dialects.postgresql import UUID
 
 
 def seed_user_and_badge_tables_from_csv():
-    Session = SessionLocal
-    session = Session()
+    """Seed database with test data from customer.csv"""
+    session = SessionLocal()
     # Check if any user already exists in the database
     existing_user_count = session.query(User).count()
 
@@ -18,7 +16,7 @@ def seed_user_and_badge_tables_from_csv():
         print("Users already exist in the database. Skipping seeding.")
         return
 
-    with open('customers.csv', mode="r") as file:
+    with open("customers.csv", mode="r") as file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             customer_id = row["customer_id"]
@@ -27,7 +25,11 @@ def seed_user_and_badge_tables_from_csv():
             # Generate a new UUID for the user
             user_id = uuid.uuid4()
 
-            badge_names = [badge for badge in row.values() if badge and badge != customer_id and badge != status]
+            badge_names = [
+                badge
+                for badge in row.values()
+                if badge and badge != customer_id and badge != status
+            ]
 
             # Check if the user already exists in the database
             user = session.query(User).filter(User.id == user_id).first()
@@ -48,7 +50,10 @@ def seed_user_and_badge_tables_from_csv():
 
             # Add or update badges for the user
             for badge_name in badge_names:
-                badge = next((b for b in existing_badges if b.badge_name == badge_name), None)
+                badge = next(
+                    (b for b in existing_badges if b.badge_name == badge_name),
+                    None,
+                )
                 if badge:
                     badge.badge_name = badge_name
                 else:

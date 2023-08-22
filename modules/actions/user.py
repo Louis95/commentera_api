@@ -1,16 +1,22 @@
-import sqlalchemy
-from sqlalchemy.orm import Session
-from sqlalchemy import cast, String
-import sqlalchemy.exc
-from fastapi import HTTPException, status
+"""User related actions"""
 from uuid import UUID
 
-from modules.database.models import User, Badge
-from modules.database.schemas.user import AddBadges, UpdateBadges, DeleteBadges
+import sqlalchemy
+import sqlalchemy.exc
+from fastapi import HTTPException, status
+from sqlalchemy import String, cast
+from sqlalchemy.orm import Session
+
+from modules.database.models import Badge, User
+from modules.database.schemas.user import AddBadges, DeleteBadges, UpdateBadges
 from modules.utilities.auth import CUSTOMER_CONFIG
 
 
-def get_user_by_id_and_customer(user_id: UUID, customer_alias: str, db_session: Session) -> User:
+def get_user_by_id_and_customer(
+    user_id: UUID,
+    customer_alias: str,
+    db_session: Session,
+) -> User:
     """
     Get a user by ID and customer alias.
 
@@ -36,7 +42,11 @@ def get_user_by_id_and_customer(user_id: UUID, customer_alias: str, db_session: 
         ) from no_result_exception
 
 
-def add_badges_to_user(user: User, add_badge_info: AddBadges, db_session: Session) -> dict:
+def add_badges_to_user(
+    user: User,
+    add_badge_info: AddBadges,
+    db_session: Session,
+) -> dict:
     """
     Add badges to a user.
 
@@ -47,16 +57,19 @@ def add_badges_to_user(user: User, add_badge_info: AddBadges, db_session: Sessio
     """
     customer_info = CUSTOMER_CONFIG.get_customer_config(user.customer_id)
 
-    if not customer_info.get('badges'):
+    if not customer_info.get("badges"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You have not configured badges yet",
         )
 
-    if not CUSTOMER_CONFIG.is_valid_customer_badges(user.customer_id, add_badge_info.badge_names):
+    if not CUSTOMER_CONFIG.is_valid_customer_badges(
+        user.customer_id,
+        add_badge_info.badge_names,
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"You do not have all the badge(s) provided in the request",
+            detail="You do not have all the badge(s) provided in the request",
         )
 
     if len(user.badges) + len(add_badge_info.badge_names) > 2:
@@ -73,7 +86,11 @@ def add_badges_to_user(user: User, add_badge_info: AddBadges, db_session: Sessio
     return {"message": "Badges added successfully"}
 
 
-def update_user_badges(user: User, update_badge_info: UpdateBadges, db_session: Session) -> dict:
+def update_user_badges(
+    user: User,
+    update_badge_info: UpdateBadges,
+    db_session: Session,
+) -> dict:
     """
     Update user badges.
 
@@ -84,16 +101,19 @@ def update_user_badges(user: User, update_badge_info: UpdateBadges, db_session: 
     """
     customer_info = CUSTOMER_CONFIG.get_customer_config(user.customer_id)
 
-    if not customer_info.get('badges'):
+    if not customer_info.get("badges"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You have not configured badges yet",
         )
 
-    if not CUSTOMER_CONFIG.is_valid_customer_badges(user.customer_id, update_badge_info.badge_names):
+    if not CUSTOMER_CONFIG.is_valid_customer_badges(
+        user.customer_id,
+        update_badge_info.badge_names,
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"You do not have all the badge(s) provided in the request",
+            detail="You do not have all the badge(s) provided in the request",
         )
 
     num_user_badges = len(user.badges)
@@ -112,7 +132,11 @@ def update_user_badges(user: User, update_badge_info: UpdateBadges, db_session: 
     return {"message": "Badges updated successfully"}
 
 
-def delete_user_badges(user: User, delete_badge_info: DeleteBadges, db_session: Session) -> dict:
+def delete_user_badges(
+    user: User,
+    delete_badge_info: DeleteBadges,
+    db_session: Session,
+) -> dict:
     """
     Delete user badges.
 
@@ -122,7 +146,11 @@ def delete_user_badges(user: User, delete_badge_info: DeleteBadges, db_session: 
     :return: Response message.
     """
     for badge_name in delete_badge_info.badge_names:
-        badge = db_session.query(Badge).filter_by(user_id=user.id, badge_name=badge_name).first()
+        badge = (
+            db_session.query(Badge)
+            .filter_by(user_id=user.id, badge_name=badge_name)
+            .first()
+        )
         if badge:
             db_session.delete(badge)
 

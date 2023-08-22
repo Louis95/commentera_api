@@ -1,14 +1,12 @@
+"""Main file"""
 import os
 import sys
 
-import uvicorn as uvicorn
+import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-import asyncio
-from modules.routers import user
-from modules.routers import auth
 
-from modules.actions.customer import CustomerConfig
+from modules.routers import auth, user
 from modules.utilities.auth import CUSTOMER_CONFIG
 from modules.utilities.response import base_responses
 
@@ -19,16 +17,15 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 API_TITLE = "Commentera API"
 
 
-
 app = FastAPI(
     responses={**base_responses},
     title=API_TITLE,
     description="Commentera offers their customers to create communities, where many "
-                "users could comment on articles, created by customers as the community owners",
+    "users could comment on articles, created by customers as the community owners",
     docs_url=None,
     openapi_url="/api/v1/openapi.json",
     redoc_url="/docs",
-    version='1.0'
+    version="1.0",
 )
 app.include_router(user.router)
 app.include_router(auth.router)
@@ -36,7 +33,8 @@ app.include_router(auth.router)
 
 @app.on_event("startup")
 async def startup_event():
-    print("Starting...........")
+    """Startup event to update customer configurations"""
+    print("Starting event to refresh customer configuration..")
     await CUSTOMER_CONFIG.start_refresh_task()
 
 
@@ -58,5 +56,5 @@ if __name__ == "__main__":
     else:
         sys.stderr.write(
             "Variable DATABASE_URL cannot be found in environment. Put it in .env or in "
-            "the DATABASE_URL environment variable\n"
+            "the DATABASE_URL environment variable\n",
         )

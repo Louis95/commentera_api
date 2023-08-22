@@ -2,15 +2,16 @@
 Authentication Utilities
 """
 
+import os
+from datetime import datetime, timedelta
+
+import jwt
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, OAuth2PasswordBearer
-import os
 
-from modules.utilities.config import app_config
 from modules.actions.customer import CustomerConfig
-import jwt
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
+from modules.utilities.config import app_config
 
 security = HTTPBearer()
 
@@ -21,11 +22,13 @@ load_dotenv()
 CUSTOMER_CONFIG = CustomerConfig(
     redis_host=os.getenv("REDIS_HOST"),
     redis_port=int(os.getenv("REDIS_PORT")),
-    refresh_rate=int(os.getenv("REFRESH_RATE", 300))
+    refresh_rate=int(os.getenv("REFRESH_RATE")),
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="generate_token", auto_error=False, description="Bearer token for authentication"
+    tokenUrl="generate_token",
+    auto_error=False,
+    description="Bearer token for authentication",
 )
 
 
@@ -70,16 +73,16 @@ def authenticate_customer(bearer_token: str = Depends(oauth2_scheme)) -> str:
             )
 
         return customer_alias
-    except jwt.ExpiredSignatureError:
+    except jwt.ExpiredSignatureError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token expired",
-        )
-    except jwt.DecodeError:
+        ) from exc
+    except jwt.DecodeError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalid",
-        )
+        ) from exc
 
 
 def generate_jwt_token(customer_alias: str) -> str:
@@ -94,7 +97,7 @@ def generate_jwt_token(customer_alias: str) -> str:
     """
     payload = {
         "customer_alias": customer_alias,
-        "exp": datetime.utcnow() + timedelta(minutes=30)  # Token expiration time
+        "exp": datetime.utcnow() + timedelta(minutes=30),  # Token expiration time
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     return token
@@ -120,7 +123,7 @@ def generate_customer_token(customer_alias: str) -> dict:
             detail="Invalid customer alias",
         )
 
-    customer_status = customer_config.get('status')
+    customer_status = customer_config.get("status")
     if customer_status != "active":
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,

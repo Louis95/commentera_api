@@ -1,10 +1,12 @@
-import json
+"""Customer configuration actions"""
+
 import csv
+import json
+from typing import Any, Dict, List
+
 import redis
-from cachetools import TTLCache
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import HTTPException, status
-from typing import Dict, List, Any
 
 
 class CustomerConfig:
@@ -63,14 +65,14 @@ class CustomerConfig:
         """
         customer_info = self.cache.hget(customer_id, "customer_info")
 
-        if customer_info is not None:
-            customer_info_str = customer_info.decode("utf-8")
-            return json.loads(customer_info_str)
-        else:
+        if customer_info is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unregistered customer",
             )
+
+        customer_info_str = customer_info.decode("utf-8")
+        return json.loads(customer_info_str)
 
     def is_valid_customer_badges(self, customer_alias: str, badges: List[str]) -> bool:
         """
@@ -98,7 +100,9 @@ class CustomerConfig:
         # Store customer data in Redis
         for customer_id, customer_info in customer_data.items():
             self.cache.hset(
-                customer_id, "customer_info", json.dumps(customer_info)
+                customer_id,
+                "customer_info",
+                json.dumps(customer_info),
             )
 
     async def start_refresh_task(self) -> None:
@@ -108,10 +112,13 @@ class CustomerConfig:
         print("Scheduling refresh task...")
         self._refresh_config()
         self.scheduler.add_job(
-            self._refresh_config, trigger="interval", seconds=self.refresh_rate
+            self._refresh_config,
+            trigger="interval",
+            seconds=self.refresh_rate,
         )
         self.scheduler.start()
         print("Refresh task scheduled.")
+
 
 # Usage example:
 # config = CustomerConfig(redis_host="localhost", redis_port=6379, refresh_rate=5)
