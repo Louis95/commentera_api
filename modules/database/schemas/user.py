@@ -1,20 +1,40 @@
 """Schemas for various badge operations"""
 
-
 from typing import List
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class UpdateBadges(BaseModel):
     """Update Badges schema"""
 
-    badge_names: List[str] = Field(
+    new_badge_names: List[str] = Field(
         ...,
-        description="List of badges to update to the user",
+        description="List of new badges to be assigned to the user",
         max_items=2,
         min_items=1,
     )
+    old_badge_names: List[str] = Field(
+        ...,
+        description="List of badges to be updated",
+        max_items=2,
+        min_items=1,
+    )
+
+    @model_validator(mode="before")
+    def validate_number_of_badges_to_update(self, values):
+        """Validate the number of badges to be updated
+
+        :param values: schema values
+        :return: schema values
+        """
+        new_badges = values.get("new_badge_names")
+        old_badges = values.get("old_badge_names")
+        if len(new_badges) != len(old_badges):
+            raise ValueError("Number of new badges must match the number of old badges")
+
+        return values
 
 
 class AddBadges(BaseModel):
@@ -37,3 +57,22 @@ class DeleteBadges(BaseModel):
         max_items=2,
         min_items=1,
     )
+
+
+class BadgeSchema(BaseModel):
+    """Badge schema"""
+
+    badge_name: str = Field(None, description="Badge name")
+
+
+class UserSchema(BaseModel):
+    """User schema"""
+
+    id: UUID = Field(None, description="user id")
+    customer_alias: str = Field(None, description="Customer alias")
+    badges: List[BadgeSchema]
+
+    class Config:
+        """Configuration for this schema class"""
+
+        from_attributes = True

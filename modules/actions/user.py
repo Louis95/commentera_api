@@ -1,4 +1,5 @@
 """User related actions"""
+from typing import List
 from uuid import UUID
 
 import sqlalchemy
@@ -8,7 +9,13 @@ from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
 from modules.database.models import Badge, User
-from modules.database.schemas.user import AddBadges, DeleteBadges, UpdateBadges
+from modules.database.schemas.user import (
+    AddBadges,
+    BadgeSchema,
+    DeleteBadges,
+    UpdateBadges,
+    UserSchema,
+)
 from modules.utilities.auth import CUSTOMER_CONFIG
 
 
@@ -46,14 +53,14 @@ def add_badges_to_user(
     user: User,
     add_badge_info: AddBadges,
     db_session: Session,
-) -> dict:
+) -> None:
     """
     Add badges to a user.
 
     :param user: User object.
     :param add_badge_info: Badge information to add.
     :param db_session: Database session.
-    :return: Response message.
+    :return: None.
     """
     customer_info = CUSTOMER_CONFIG.get_customer_config(user.customer_id)
 
@@ -83,24 +90,22 @@ def add_badges_to_user(
         db_session.add(badge)
 
     db_session.commit()
-    return {"message": "Badges added successfully"}
 
 
 def update_user_badges(
     user: User,
     update_badge_info: UpdateBadges,
     db_session: Session,
-) -> dict:
+) -> None:
     """
     Update user badges.
 
     :param user: User object.
     :param update_badge_info: Badge information to update.
     :param db_session: Database session.
-    :return: Response message.
+    :return: None.
     """
     customer_info = CUSTOMER_CONFIG.get_customer_config(user.customer_id)
-
     if not customer_info.get("badges"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -109,34 +114,45 @@ def update_user_badges(
 
     if not CUSTOMER_CONFIG.is_valid_customer_badges(
         user.customer_id,
-        update_badge_info.badge_names,
+        update_badge_info.new_badge_names,
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You do not have all the badge(s) provided in the request",
         )
+    old_badge_names = update_badge_info.old_badge_names
+    new_badge_names = update_badge_info.new_badge_names
 
-    num_user_badges = len(user.badges)
-    num_request_badges = len(update_badge_info.badge_names)
+    if len(old_badge_names) != len(new_badge_names):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Number of old and new badges must be the same",
+        )
 
-    if num_user_badges == 2 and num_request_badges == 1:
-        user.badges[0].badge_name = update_badge_info.badge_names[0]
-    elif num_user_badges == 1 and num_request_badges == 1:
-        new_badge = Badge(badge_name=update_badge_info.badge_names[0], user=user)
-        db_session.add(new_badge)
-    elif num_request_badges == 2:
-        for badge, new_badge_name in zip(user.badges, update_badge_info.badge_names):
-            badge.badge_name = new_badge_name
+    user_badge_names = [badge.badge_name for badge in user.badges]
+
+    # Check if the user has all the old badges
+    if not all(
+        old_badge_name in user_badge_names for old_badge_name in old_badge_names
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User does not have all the old badges to be updated",
+        )
+
+    # Update the badges
+    for badge, new_badge_name in zip(user.badges, new_badge_names):
+        badge_index = user_badge_names.index(badge.badge_name)
+        user.badges[badge_index].badge_name = new_badge_name
 
     db_session.commit()
-    return {"message": "Badges updated successfully"}
 
 
 def delete_user_badges(
     user: User,
     delete_badge_info: DeleteBadges,
     db_session: Session,
-) -> dict:
+) -> None:
     """
     Delete user badges.
 
@@ -153,6 +169,44 @@ def delete_user_badges(
         )
         if badge:
             db_session.delete(badge)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Badge '{badge_name}' does not exist for the user",
+            )
 
     db_session.commit()
-    return {"message": "Badges deleted successfully"}
+
+
+def get_customer_users(customer_alias: str, db_session: Session) -> List[UserSchema]:
+    """
+    Get users by customer ID.
+
+    :param customer_alias: customer alias.
+    :param db_session: Database session.
+    :return: Response message.
+    """
+
+    users: List[User] = (
+        db_session.query(User).filter_by(customer_id=customer_alias).all()
+    )
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No users found for customer_id: {customer_alias}",
+        )
+
+    # Convert User objects to UserSchema objects
+    user_schemas = []
+    for user in users:
+        badge_schemas = [
+            BadgeSchema(badge_name=badge.badge_name) for badge in user.badges
+        ]
+        user_schema = UserSchema(
+            id=user.id,
+            customer_alias=user.customer_id,
+            badges=badge_schemas,
+        )
+        user_schemas.append(user_schema)
+
+    return user_schemas

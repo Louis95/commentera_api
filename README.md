@@ -171,3 +171,5 @@ Here is a sample payload.
   "customer_alias": "bbg",
 }
 ```
+
+You can get sample user IDs accessing the [users/by_customer](http://0.0.0.0:8000/users/by_customer) endpoint. This is a protected endpoint, so don't forget to use the token generated above to access it.

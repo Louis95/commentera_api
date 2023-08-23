@@ -118,8 +118,3 @@ class CustomerConfig:
         )
         self.scheduler.start()
         print("Refresh task scheduled.")
-
-
-# Usage example:
-# config = CustomerConfig(redis_host="localhost", redis_port=6379, refresh_rate=5)
-# asyncio.run(config.start_refresh_task())

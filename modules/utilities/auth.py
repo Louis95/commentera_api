@@ -22,7 +22,7 @@ load_dotenv()
 CUSTOMER_CONFIG = CustomerConfig(
     redis_host=os.getenv("REDIS_HOST"),
     redis_port=int(os.getenv("REDIS_PORT")),
-    refresh_rate=int(os.getenv("REFRESH_RATE")),
+    refresh_rate=app_config.refresh_rate,
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
