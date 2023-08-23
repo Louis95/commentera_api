@@ -64,7 +64,8 @@ def mock_customer_alias():
 
 
 @pytest.fixture
-def mock_add_badge_user():
+# pylint: disable=W0621
+def mock_add_badge_user(db_session):
     """Create mock user for adding badges"""
 
     new_test_user = User(id=uuid4(), customer_id="bbg")
@@ -75,7 +76,8 @@ def mock_add_badge_user():
 
 
 @pytest.fixture
-def mock_update_badge_user():
+# pylint: disable=W0621
+def mock_update_badge_user(db_session):
     """Create mock user for updating badges"""
 
     mock_user = User(id=uuid4(), customer_id="xbahn")
@@ -87,7 +89,8 @@ def mock_update_badge_user():
 
 
 @pytest.fixture
-def mock_delete_badge_user():
+# pylint: disable=W0621
+def mock_delete_badge_user(db_session):
     """Create mock user for deleting badges"""
     mock_user = User(id=uuid4(), customer_id="xbahn")
     badge1 = Badge(badge_name="SPAMMER", user=mock_user)
