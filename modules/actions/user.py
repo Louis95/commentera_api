@@ -9,7 +9,7 @@ from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
 from modules.database.models import Badge, User
-from modules.database.schemas.user import (
+from modules.database.schemas.user_schemas import (
     AddBadges,
     BadgeSchema,
     DeleteBadges,

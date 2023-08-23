@@ -12,18 +12,22 @@ class UpdateBadges(BaseModel):
     new_badge_names: List[str] = Field(
         ...,
         description="List of new badges to be assigned to the user",
-        max_items=2,
-        min_items=1,
+        max_length=2,
+        min_length=1,
     )
     old_badge_names: List[str] = Field(
         ...,
         description="List of badges to be updated",
-        max_items=2,
-        min_items=1,
+        max_length=2,
+        min_length=1,
     )
 
     @model_validator(mode="before")
-    def validate_number_of_badges_to_update(self, values):
+    # pylint: disable=E0213
+    def validate_number_of_badges_to_update(
+        cls,
+        values,
+    ):
         """Validate the number of badges to be updated
 
         :param values: schema values
@@ -43,8 +47,8 @@ class AddBadges(BaseModel):
     badge_names: List[str] = Field(
         ...,
         description="List of badges to be added to the user",
-        max_items=2,
-        min_items=1,
+        max_length=2,
+        min_length=1,
     )
 
 
@@ -54,8 +58,8 @@ class DeleteBadges(BaseModel):
     badge_names: List[str] = Field(
         ...,
         description="List of badges to be deleted to the user",
-        max_items=2,
-        min_items=1,
+        max_length=2,
+        min_length=1,
     )
 
 
@@ -72,7 +76,7 @@ class UserSchema(BaseModel):
     customer_alias: str = Field(None, description="Customer alias")
     badges: List[BadgeSchema]
 
-    class Config:
+    class ConfigDict:
         """Configuration for this schema class"""
 
         from_attributes = True

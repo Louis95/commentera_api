@@ -13,7 +13,7 @@ from modules.actions.user import (
     get_user_by_id_and_customer,
     update_user_badges,
 )
-from modules.database.schemas.user import (
+from modules.database.schemas.user_schemas import (
     AddBadges,
     DeleteBadges,
     UpdateBadges,
