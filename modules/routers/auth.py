@@ -20,15 +20,6 @@ def generate_token(
 ) -> dict[str, str]:
     """
     Generate a token for the specified customer alias.
-
-    Args:
-        customer_alias_info (GenerateToken): Customer alias information.
-
-    Returns:
-        dict: Generated token.
-
-    Raises:
-        HTTPException: If unable to generate the token.
     """
     try:
         return generate_customer_token(customer_alias_info.customer_alias)

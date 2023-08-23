@@ -40,18 +40,6 @@ def add_badges(
 ) -> SuccessfulResponseOut:
     """
     Add badges to a user.
-
-    Args:
-        user_id (UUID): The ID of the user.
-        add_badge_info (AddBadges): List of badges to be added.
-        customer_alias (str): Customer alias obtained from authentication.
-        db_session (Session): SQLAlchemy session.
-
-    Returns:
-        dict: Response message.
-
-    Raises:
-        HTTPException: If unable to add badges.
     """
     try:
         user = get_user_by_id_and_customer(user_id, customer_alias, db_session)
@@ -89,18 +77,6 @@ def update_badges(
 ) -> SuccessfulResponseOut:
     """
     Update badges for a user.
-
-    Args:
-        user_id (UUID): The ID of the user.
-        update_badge_info (UpdateBadges): List of badges to be updated.
-        db_session (Session): SQLAlchemy session.
-        customer_alias (str): Customer alias obtained from authentication.
-
-    Returns:
-        dict: Response message.
-
-    Raises:
-        HTTPException: If unable to update badges.
     """
     try:
         user = get_user_by_id_and_customer(user_id, customer_alias, db_session)
@@ -139,18 +115,6 @@ def delete_badges(
 ) -> SuccessfulResponseOut:
     """
     Delete badges from a user.
-
-    Args:
-        user_id (UUID): The ID of the user.
-        delete_badge_info (DeleteBadges): List of badges to be deleted.
-        db_session (Session): SQLAlchemy session.
-        customer_alias (str): Customer alias obtained from authentication.
-
-    Returns:
-        dict: Response message.
-
-    Raises:
-        HTTPException: If unable to delete badges.
     """
     user = get_user_by_id_and_customer(user_id, customer_alias, db_session)
 
@@ -179,12 +143,6 @@ def get_users_by_customer_id(
     Retrieve a list of users with a specific customer_id.
 
     This endpoint allows you to retrieve all users associated with a given customer_id.
-
-    Returns:
-        - List[UserSchema]: A list of User objects with the specified customer_id.
-
-    Raises:
-        - HTTPException: If no users are found for the provided customer_id.
 
     """
     try:
