@@ -49,6 +49,7 @@ $ python3 -m pip install pre-commit
 
 $ pre-commit install
 ```
+![api endpoints](images/pre-commit.png)
 
 ### Set up Docker
 
@@ -139,12 +140,15 @@ You can test by running the command. Make you have your database set-up before r
 ```shell
 $ pytest
 ```
+![api endpoints](images/tests.png)
 
-###
+
 
 ## API Documentation
 
 Once the application is running, you can view the API documentation by opening [http://0.0.0.0:8000/docs](http://0.0.0.0:8000/docs) in the web browser of your choice.
+
+![api endpoints](images/badge-operations-api.png)
 
 ## Test API.
 
@@ -163,3 +167,5 @@ You can get sample user IDs accessing the [users/by_customer](http://0.0.0.0:800
     curl --location 'http://0.0.0.0:8000/users/by_customer' \
 --header 'Authorization: Bearer <replace this with token>'
 ```
+
+### Images
