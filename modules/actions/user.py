@@ -129,21 +129,18 @@ def update_user_badges(
             detail="Number of old and new badges must be the same",
         )
 
-    user_badge_names = [badge.badge_name for badge in user.badges]
-
-    # Check if the user has all the old badges
-    if not all(
-        old_badge_name in user_badge_names for old_badge_name in old_badge_names
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User does not have all the old badges to be updated",
-        )
-
     # Update the badges
-    for badge, new_badge_name in zip(user.badges, new_badge_names):
-        badge_index = user_badge_names.index(badge.badge_name)
-        user.badges[badge_index].badge_name = new_badge_name
+    user_badge_names = {badge.badge_name: badge for badge in user.badges}
+    print(f"user_badge_names>>>{user_badge_names}")
+
+    for old_badge_name, new_badge_name in zip(old_badge_names, new_badge_names):
+        if old_badge_name not in user_badge_names:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"User does not have the old badge '{old_badge_name}' to be updated",
+            )
+
+        user_badge_names[old_badge_name].badge_name = new_badge_name
 
     db_session.commit()
 

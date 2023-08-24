@@ -2,20 +2,6 @@ version: "3.11"
 
 
 services:
-#  unittest:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    command: >
-#      sh -c "
-#             alembic upgrade head && python seed_database.py
-#             "
-#    environment:
-#      - DATABASE_URL=postgresql://postgres:commentera@db:5432/commentera
-#    depends_on:
-#      - db
-#    volumes:
-#      - ${HOME}/.aws/:/home/api/.aws:ro
   db:
     image: postgres:13
     restart: always

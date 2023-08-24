@@ -66,21 +66,6 @@ If you've never built the API container before (and therefore don't have any bui
 $ docker-compose build
 $ docker-compose up
 ```
-#### Run Database Migrations
-
-To connect to the API container and execute the database migrations, run:
-
-```shell
-$ docker compose exec app alembic upgrade head
-```
-
-## Starting the API using Docker
-
-If you're using Docker containers, just make sure container is online:
-
-```shell
-$ docker compose up
-```
 
 ## Start API manually
 
@@ -163,7 +148,7 @@ Once the application is running, you can view the API documentation by opening [
 
 ## Test API.
 
-After running the command to seed the database, you use a sample customer alias from the csv and get a token to test the api. Use the [generate_token](http://127.0.0.1:3000/generate_token) endpoint.
+After running the command to seed the database, you use a sample customer alias from the csv and get a token to test the api (The API uses bearer token for authentication). Use the [generate_token](http://127.0.0.1:3000/generate_token) endpoint.
 Here is a sample payload.
 
 ```shell
@@ -173,3 +158,8 @@ Here is a sample payload.
 ```
 
 You can get sample user IDs accessing the [users/by_customer](http://0.0.0.0:8000/users/by_customer) endpoint. This is a protected endpoint, so don't forget to use the token generated above to access it.
+
+```shell
+    curl --location 'http://0.0.0.0:8000/users/by_customer' \
+--header 'Authorization: Bearer <replace this with token>'
+```
