@@ -167,5 +167,3 @@ You can get sample user IDs accessing the [users/by_customer](http://0.0.0.0:800
     curl --location 'http://0.0.0.0:8000/users/by_customer' \
 --header 'Authorization: Bearer <replace this with token>'
 ```
-
-### Images

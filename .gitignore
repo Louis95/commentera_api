@@ -162,3 +162,4 @@ cython_debug/
 
 # Task definition file
 taskdef.json
+alembic.ini
